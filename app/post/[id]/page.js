@@ -1,9 +1,13 @@
+import { connectDB } from "@/lib/mongodb";
+import Post from "@/models/posts";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
 
 export default async function PostPage({ params }) {
-  const res = await fetch(`https://dummyjson.com/posts/${params.id}`);
-  const post = await res.json();
+  // Connect to DB
+  await connectDB();
+
+  const post = await Post.findById(params.id).lean(); // lean() to make plain JS object
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
@@ -14,7 +18,7 @@ export default async function PostPage({ params }) {
         <FiArrowLeft className="w-6 h-6" />
       </Link>
       <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
-      <p className="text-gray-700">{post.body}</p>
+      <p className="text-gray-700">{post.body || post.content}</p>
       <p className="text-sm text-gray-500 mt-2 flex items-center gap-4">
         <span>Views: {post.views}</span>
         <span>{post.reactions.likes} 👍</span>

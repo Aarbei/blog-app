@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import PostCard from "./PostCard";
 
 export default function PostsList() {
   const [posts, setPosts] = useState([]);
@@ -7,17 +8,19 @@ export default function PostsList() {
   useEffect(() => {
     fetch("/api/posts")
       .then((res) => res.json())
-      .then((data) => setPosts(data))
-      .catch((err) => console.error(err));
+      .then((data) => {
+        console.log("Fetched posts:", data);
+        // data должно быть массивом — если не массив, берем data.posts
+        setPosts(Array.isArray(data) ? data : data.posts || []);
+      })
+      .catch((err) => console.error("Error fetching posts:", err));
   }, []);
 
   return (
-    <ul className="mt-4">
+    <div className="mt-4">
       {posts.map((post) => (
-        <li key={post._id} className="border-b border-gray-300 py-2">
-          <strong>{post.author}:</strong> {post.content}
-        </li>
+        <PostCard key={post._id} post={post} />
       ))}
-    </ul>
+    </div>
   );
 }

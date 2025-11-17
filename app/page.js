@@ -1,5 +1,5 @@
 import PostCard from "../components/PostCard.jsx";
-import PostForm from "../models/posts.js";
+import PostForm from "../components/PostForm.js";
 import PostsList from "../components/PostList.js";
 
 export default async function HomePage() {
@@ -11,9 +11,11 @@ export default async function HomePage() {
     <div className="max-w-2xl mx-auto p-4">
       <PostForm />
       <PostsList />
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+      {
+        //{posts.map((post) => (
+        //  <PostCard key={post.id} post={post} />
+        //))}
+      }
     </div>
   );
 }
