@@ -1,7 +1,11 @@
-import { connectDB } from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongoose";
 import Post from "@/models/posts";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
+import { BsHeart } from "react-icons/bs";
+import { BsHeartbreak } from "react-icons/bs";
+import { BsChat } from "react-icons/bs";
+import { BsBarChartLineFill } from "react-icons/bs";
 
 export default async function PostPage({ params }) {
   // Connect to DB
@@ -20,9 +24,19 @@ export default async function PostPage({ params }) {
       <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
       <p className="text-gray-700">{post.body || post.content}</p>
       <p className="text-sm text-gray-500 mt-2 flex items-center gap-4">
-        <span>Views: {post.views}</span>
-        <span>{post.reactions.likes} 👍</span>
-        <span>{post.reactions.dislikes} 👎</span>
+        <BsChat />
+        <span className="flex items-center gap-1">
+          <BsBarChartLineFill />
+          {post.views}
+        </span>
+        <span className="flex items-center gap-1">
+          {post.reactions.likes}
+          <BsHeart />
+        </span>
+        <span className="flex items-center gap-1">
+          {post.reactions.dislikes}
+          <BsHeartbreak />
+        </span>
       </p>
     </div>
   );

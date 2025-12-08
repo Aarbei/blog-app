@@ -6,7 +6,7 @@ export default function Header() {
         <div className="flex items-center space-x-2">
           <img src="/twitter_logo.png" className="w-6 mb-0.5"></img>
           <h1 className="text-xl font-bold">
-            <Link href="/">NotTwitter</Link>
+            <Link href="/">Postly</Link>
           </h1>
         </div>
         <ul className="flex space-x-6">
@@ -16,8 +16,8 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link href="/" className="hover:text-gray-300 transition">
-              Profile
+            <Link href="/register" className="hover:text-gray-300 transition">
+              My Profile
             </Link>
           </li>
         </ul>

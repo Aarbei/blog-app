@@ -61,7 +61,7 @@ export default function PostForm() {
       />
       <button
         onClick={submitTweet}
-        className="bg-gray-500 text-white px-4 py-2 rounded mt-2"
+        className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
       >
         Post
       </button>
