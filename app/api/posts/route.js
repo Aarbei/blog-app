@@ -16,9 +16,9 @@ export async function POST(req) {
       tags: Array.isArray(body.tags) ? body.tags : [], //if we have not leave empty
       reactions: {
         likes: 0,
+        likedBy: [],
         dislikes: 0,
-        comments: 0,
-        views: 0,
+        comments: [],
       },
     });
 
@@ -33,7 +33,44 @@ export async function GET() {
   try {
     await connectDB();
 
-    let posts = await Post.find().sort({ createdAt: -1 });
+    // Получаем посты и сразу наполняем nicknames для likedBy и комментариев
+    let posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "reactions.likedBy",
+        select: "nickname",
+        match: { _id: { $type: "objectId" } },
+      })
+      .populate({
+        path: "reactions.comments.user",
+        select: "nickname",
+        match: { _id: { $type: "objectId" } },
+      });
+
+    // Исправляем существующие посты с неправильной структурой reactions и фильтруем пустые комментарии
+    posts = posts.map((post) => {
+      const postObj = post.toObject();
+
+      if (postObj.reactions) {
+        if (typeof postObj.reactions.comments === "number") {
+          postObj.reactions.comments = [];
+        }
+
+        if (!Array.isArray(postObj.reactions.comments)) {
+          postObj.reactions.comments = [];
+        } else {
+          postObj.reactions.comments = postObj.reactions.comments.filter(
+            (comment) => comment && comment.text && comment.text.trim()
+          );
+        }
+
+        if (!Array.isArray(postObj.reactions.likedBy)) {
+          postObj.reactions.likedBy = [];
+        }
+      }
+
+      return postObj;
+    });
 
     // If DB is empty — import from DummyJSON API
     if (posts.length === 0) {
@@ -49,8 +86,9 @@ export async function GET() {
           tags: Array.isArray(p.tags) ? p.tags : [],
           reactions: {
             likes: p.reactions?.likes || 0,
+            likedBy: [],
             dislikes: p.reactions?.dislikes || 0,
-            comments: 0,
+            comments: [],
           },
           views: p.views || 0,
         }));
@@ -60,9 +98,26 @@ export async function GET() {
       }
 
       posts = await Post.find().sort({ createdAt: -1 }); // refresh list
+
+      // Исправляем импортированные посты тоже
+      posts = posts.map((post) => {
+        const postObj = post.toObject();
+        if (postObj.reactions) {
+          if (typeof postObj.reactions.comments === "number") {
+            postObj.reactions.comments = [];
+          }
+          if (!Array.isArray(postObj.reactions.comments)) {
+            postObj.reactions.comments = [];
+          }
+          if (!Array.isArray(postObj.reactions.likedBy)) {
+            postObj.reactions.likedBy = [];
+          }
+        }
+        return postObj;
+      });
     }
 
-    return NextResponse.json(posts.map((p) => p.toObject()));
+    return NextResponse.json(posts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
